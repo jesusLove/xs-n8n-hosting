@@ -3,6 +3,13 @@
 n8n 使用 postgreSQL 做数据库
 
 
+```markdown
+.env: 环境变量参数
+.docker-compose.yml Docker 配置文件
+.init-data.sh 数据库初试化脚本
+```
+
+
 # 使用方法
 
 1. 下载当前仓库，放在合适的文件夹中（路径不要有中文）
