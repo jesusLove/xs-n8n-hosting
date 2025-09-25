@@ -28,7 +28,5 @@ GENERIC_TIMEZONE=Asia/Shanghai
 3. 执行安装指令
 
 ```
-docker-compose up -d
+docker compose up -d
 ```
-
-

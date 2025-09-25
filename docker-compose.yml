@@ -4,8 +4,8 @@ volumes:
 
 services:
   postgres:
-    image: postgres:16
-    restart: always
+    image: postgres:16                                                        # 镜像名称
+    restart: always                                                           
     environment:
       - POSTGRES_USER
       - POSTGRES_PASSWORD
@@ -22,9 +22,9 @@ services:
       retries: 10
 
   n8n:
-    image: docker.n8n.io/n8nio/n8n
+    image: docker.n8n.io/n8nio/n8n                                      # 镜像名称
     restart: always
-    environment:
+    environment:                                                        # 环境变量
       - DB_TYPE=postgresdb
       - DB_POSTGRESDB_HOST=postgres
       - DB_POSTGRESDB_PORT=5432
@@ -33,11 +33,11 @@ services:
       - DB_POSTGRESDB_PASSWORD=${POSTGRES_NON_ROOT_PASSWORD}
       - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
     ports:
-      - 3030:5678
+      - 5678:5678                                                    #端口映射
     links:
       - postgres
     volumes:
-      - ./volumes/n8n_storage:/home/node/.n8n
+      - ./volumes/n8n_storage:/home/node/.n8n                        #挂载位置
     depends_on:
       postgres:
         condition: service_healthy
