@@ -38,6 +38,8 @@ services:
       - postgres
     volumes:
       - ./volumes/n8n_storage:/home/node/.n8n                        #挂载位置
+      - ./data:/data/files                                           # 本机文件映射，存储工作流下载数据。
     depends_on:
       postgres:
         condition: service_healthy
+
