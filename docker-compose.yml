@@ -24,6 +24,9 @@ services:
   n8n:
     image: docker.n8n.io/n8nio/n8n                                      # 镜像名称
     restart: always
+     # ❗ 只暴露给容器网络，主机侧不出现 5678
+    expose:
+      - "5678"
     environment:                                                        # 环境变量
       - DB_TYPE=postgresdb
       - DB_POSTGRESDB_HOST=postgres
@@ -32,6 +35,10 @@ services:
       - DB_POSTGRESDB_USER=${POSTGRES_NON_ROOT_USER}
       - DB_POSTGRESDB_PASSWORD=${POSTGRES_NON_ROOT_PASSWORD}
       - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
+      # 1. 告诉 n8n「外部怎么访问我」
+      - WEBHOOK_URL=${N8N_PROTOCOL}://${N8N_HOST}/
+      - N8N_HOST=${N8N_HOST}
+      - N8N_PROTOCOL=${N8N_PROTOCOL}
     ports:
       - 5678:5678                                                    #端口映射
     links:
@@ -42,6 +49,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+        
   ngrok:
     image: ngrok/ngrok:latest
     command:
