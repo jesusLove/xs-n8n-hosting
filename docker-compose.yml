@@ -1,10 +1,8 @@
-volumes:
-  db_storage:
-  n8n_storage:
 
 services:
   postgres:
-    image: postgres:16                                                        # 镜像名称
+    image: postgres:16    
+    container_name: postgres                                                    # 镜像名称
     restart: always                                                           
     environment:
       - POSTGRES_USER
@@ -20,9 +18,12 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    networks:
+      - n8n-net
 
   n8n:
-    image: docker.n8n.io/n8nio/n8n                                      # 镜像名称
+    image: docker.n8n.io/n8nio/n8n    
+    container_name: n8n                                  # 镜像名称
     restart: always
     environment:                                                        # 环境变量
       - DB_TYPE=postgresdb
@@ -42,4 +43,11 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - n8n-net
+
+networks:
+  n8n-net:
+    driver: bridge
+    
 
