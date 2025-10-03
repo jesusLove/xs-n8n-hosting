@@ -46,6 +46,47 @@ services:
     networks:
       - n8n-net
 
+  redis:
+    image: redis:7-alpine
+    container_name: ${REDIS_HOST}
+    restart: always
+    command: redis-server --save "" --appendonly no   # 纯缓存，不落地
+    networks:
+      - n8n-net
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - ./data/redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  rsshub:
+    image: diygod/rsshub:chromium-bundled   # 带 Chromium，支持需要 puppeteer 的路由
+    container_name: ${RSSHub_CONTAINER_NAME}
+    restart: always
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - n8n-net
+    ports:
+      - "${RSSHub_PORT}:1200"
+    environment:
+      NODE_ENV: production
+      REDIS_URL: "redis://${REDIS_HOST}:${REDIS_PORT}/0"
+      # 下面给 Redis 缓存加前缀，防止多实例冲突
+      REDIS_KEY_PREFIX: "${REDIS_KEY_PREFIX}"
+      # 其他参数在这里添加
+      # ......
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:1200/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
 networks:
   n8n-net:
     driver: bridge
