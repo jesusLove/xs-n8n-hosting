@@ -48,15 +48,15 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: ${REDIS_HOST}
+    container_name: redis
     restart: always
     command: redis-server --save "" --appendonly no   # 纯缓存，不落地
     networks:
       - n8n-net
     ports:
-      - "${REDIS_PORT}:6379"
+      - "6379:6379"
     volumes:
-      - ./data/redis-data:/data
+      - ./volumes/redis-storage:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -65,7 +65,7 @@ services:
 
   rsshub:
     image: diygod/rsshub:chromium-bundled   # 带 Chromium，支持需要 puppeteer 的路由
-    container_name: ${RSSHub_CONTAINER_NAME}
+    container_name: rsshub
     restart: always
     depends_on:
       redis:
