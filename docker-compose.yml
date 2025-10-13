@@ -103,7 +103,7 @@ services:
     environment:
       NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
     ports:
-      - 4040:4040
+      - 14040:4040
 
 networks:
   n8n-net:
