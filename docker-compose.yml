@@ -88,6 +88,7 @@ services:
       REDIS_KEY_PREFIX: "${REDIS_KEY_PREFIX}"
       # 其他参数在这里添加
       # ......
+      XIAOHONGSHU_COOKIE: ${XIAOHONGSHU_COOKIE}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:1200/healthz"]
       interval: 30s
