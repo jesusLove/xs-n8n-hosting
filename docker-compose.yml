@@ -38,7 +38,7 @@ services:
       - N8N_HOST=${N8N_HOST}
       - N8N_PROTOCOL=${N8N_PROTOCOL}
     ports:
-      - 5678:5678                                                    #端口映射
+      - "${N8N_PORT}:5678"                                                   #端口映射
     links:
       - postgres
     volumes:
@@ -99,11 +99,11 @@ services:
       - n8n-net
     command:
       - "http"
-      - "http://host.docker.internal:5678"
+      - "http://host.docker.internal:${N8N_PORT}"
     environment:
       NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
     ports:
-      - 14040:4040
+      - 4040:4040
 
 networks:
   n8n-net:
