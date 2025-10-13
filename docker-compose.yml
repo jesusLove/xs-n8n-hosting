@@ -25,9 +25,6 @@ services:
     image: docker.n8n.io/n8nio/n8n    
     container_name: n8n                                  # 镜像名称
     restart: always
-     # ❗ 只暴露给容器网络，主机侧不出现 5678
-    expose:
-      - "5678"
     environment:                                                        # 环境变量
       - DB_TYPE=postgresdb
       - DB_POSTGRESDB_HOST=postgres
@@ -97,13 +94,16 @@ services:
 
   ngrok:
     image: ngrok/ngrok:latest
+    container_name: ngrok
+    networks:
+      - n8n-net
     command:
       - "http"
       - "http://host.docker.internal:5678"
     environment:
       NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
     ports:
-      - 4040:4040
+      - 14040:4040
 
 networks:
   n8n-net:
