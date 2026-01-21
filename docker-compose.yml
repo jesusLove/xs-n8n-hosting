@@ -20,7 +20,6 @@ services:
       retries: 10
     networks:
       - n8n-net
-
   n8n:
     image: docker.n8n.io/n8nio/n8n    
     container_name: n8n                                  # 镜像名称
@@ -33,10 +32,6 @@ services:
       - DB_POSTGRESDB_USER=${POSTGRES_NON_ROOT_USER}
       - DB_POSTGRESDB_PASSWORD=${POSTGRES_NON_ROOT_PASSWORD}
       - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
-      # 1. 告诉 n8n「外部怎么访问我」
-      - WEBHOOK_URL=${N8N_PROTOCOL}://${N8N_HOST}/
-      - N8N_HOST=${N8N_HOST}
-      - N8N_PROTOCOL=${N8N_PROTOCOL}
     ports:
       - "${N8N_PORT}:5678"                                                   #端口映射
     links:
@@ -49,62 +44,6 @@ services:
         condition: service_healthy
     networks:
       - n8n-net
-
-  redis:
-    image: redis:7-alpine
-    container_name: redis
-    restart: always
-    command: redis-server --save "" --appendonly no   # 纯缓存，不落地
-    networks:
-      - n8n-net
-    ports:
-      - "6379:6379"
-    volumes:
-      - ./volumes/redis-storage:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
-
-  rsshub:
-    image: diygod/rsshub:chromium-bundled   # 带 Chromium，支持需要 puppeteer 的路由
-    container_name: rsshub
-    restart: always
-    depends_on:
-      redis:
-        condition: service_healthy
-    networks:
-      - n8n-net
-    ports:
-      - "${RSSHub_PORT}:1200"
-    environment:
-      NODE_ENV: production
-      REDIS_URL: "redis://${REDIS_HOST}:${REDIS_PORT}/0"
-      # 下面给 Redis 缓存加前缀，防止多实例冲突
-      REDIS_KEY_PREFIX: "${REDIS_KEY_PREFIX}"
-      # 其他参数在这里添加
-      # ......
-      XIAOHONGSHU_COOKIE: ${XIAOHONGSHU_COOKIE}
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:1200/healthz"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  ngrok:
-    image: ngrok/ngrok:latest
-    container_name: ngrok
-    networks:
-      - n8n-net
-    command:
-      - "http"
-      - "http://host.docker.internal:${N8N_PORT}"
-    environment:
-      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
-    ports:
-      - 14040:4040
-
 networks:
   n8n-net:
     driver: bridge
